@@ -21,8 +21,8 @@ async function update() {
             let extractedFeed = await extract(feeds[i].url);
             
             if (feeds[i].latest.id != extractedFeed.entries[0].id) {
-                bot.post(`@${feeds[i].user} A new entry in "${feeds[i].latest.title}" has been published!
-    ${feeds[i].latest.link}`);
+                bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!
+    ${extractedFeed.entries[0].link}`);
                 feeds[i].latest = extractedFeed.entries[0];
             } else {
                 continue;
@@ -42,12 +42,13 @@ bot.onPost(async (user, content) => {
         try {
             let feed = await extract(content.split(" ")[2]);
             let subscriptions = db.get("feeds");
-            subscriptions.push({"name": feed.title,"url": content.split(" ")[2], "latest": feed.entries[0],"user": user});
+            subscriptions.push({"name": feed.title, "url": content.split(" ")[2], "latest": feed.entries[0],"user": user});
             bot.post(`Successfully subscribed to "${feed.title}"!`)
         db.set(subscriptions);
         } catch(e) {
             console.error(e);
-            bot.post("There was a error fetching the feed!");
+            bot.post(`There was a error fetching the feed!
+    ${e}`);
             return;
         }
     }

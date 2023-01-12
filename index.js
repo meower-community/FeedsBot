@@ -21,7 +21,7 @@ async function update() {
             let extractedFeed = await extract(feeds[i].url);
             
             if (feeds[i].latest.id != extractedFeed.entries[0].id) {
-                bot.post(`@${feeds[i].user} A new entry in "${feeds[i].title}" has been published!
+                bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!
     ${extractedFeed.entries[0].link}`);
                 feeds[i].latest = extractedFeed.entries[0];
             } else {

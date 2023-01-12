@@ -20,7 +20,7 @@
   "dependencies": {
     "@extractus/feed-extractor": "^6.2.1",
     "dotenv": "^16.0.3",
-    "meowerbot": "^1.2.4",
+    "meowerbot": "^1.2.5",
     "simple-json-db": "^2.0.0"
   }
 }

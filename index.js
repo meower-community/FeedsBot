@@ -18,12 +18,14 @@ async function update() {
     try {
         let feeds = db.get("feeds");
         for (let i in feeds) {
-            let extracted = feeds[i];
-            let extractedFeed = await extract(extracted.url);
+            let extractedFeed = await extract(feeds[i].url);
             
-            if (new Date(feeds[i].latest.published).getTime() < new Date().getTime()) {
-                bot.post(`@${feeds[i].user} A new entry in "${feeds[i].title}" has been published!
+            if (feeds[i].latest.id !== extractedFeed.entries[0].id) {
+                bot.post(`@${feeds[i].user} A new entry in "${feeds[i].latest.title}" has been published!
     ${feeds[i].latest.link}`);
+                feeds[i].latest = extractedFeed.entries[0];
+            } else {
+                continue;
             }
         }
     } catch(e) {

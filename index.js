@@ -73,6 +73,10 @@ bot.onPost(async (user, content) => {
     }
 });
 
+bot.onMessage((data) => {
+    console.log(`New message: ${data}`);
+});
+
 bot.onClose(() => {
     console.error("Disconnected");
 });

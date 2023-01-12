@@ -1,0 +1,26 @@
+{
+  "name": "feedsbot",
+  "version": "1.0.0",
+  "description": "FeedsBot lets you subscribe to RSS and Atom feeds on Meower!",
+  "main": "./src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MeowerBots/FeedsBot.git"
+  },
+  "author": "M.D. Walters",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MeowerBots/FeedsBot/issues"
+  },
+  "homepage": "https://github.com/MeowerBots/FeedsBot#readme",
+  "dependencies": {
+    "@extractus/feed-extractor": "^6.2.1",
+    "dotenv": "^16.0.3",
+    "meowerbot": "^1.2.4",
+    "simple-json-db": "^2.0.0"
+  }
+}

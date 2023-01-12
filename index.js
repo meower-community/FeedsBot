@@ -35,7 +35,7 @@ async function update() {
 
 bot.onPost(async (user, content) => {
     if (content.startsWith(`@${username} help`)) {
-        bot.post(`Commands: ${help.join(" ")}`);
+        bot.post(`Commands: ${help.join(", ")}`);
     }
 
     if (content.startsWith(`@${username} subscribe`)) {

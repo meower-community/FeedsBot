@@ -47,7 +47,7 @@ bot.onPost(async (user, content) => {
         db.set(subscriptions);
         } catch(e) {
             console.error(e);
-            bot.post(`There was a error fetching the feed!
+            bot.post(`There was a error subscribing to the feed!
     ${e}`);
             return;
         }
@@ -57,15 +57,17 @@ bot.onPost(async (user, content) => {
         try { 
             let feed = await extract(content.split(" ")[2]);
             let subscriptions = db.get("feeds");
-            for (var i = subscriptions.length - 1; i >= 0; i--) {
-                if (subscriptions[i] === {"name": feed.title,"url": content.split(" ")[2], "latest": feed.entries[0],"user": user}) {
+            for (i in subscriptions) {
+                if (subscriptions[i].name == feed.title) {
                     subscriptions.splice(i, 1);
                 }
             }
-        db.set(subscriptions);
+            db.set(subscriptions);
+            bot.post(`Successfully unsubscribed from ${feed.title}!`);
         } catch(e) {
             console.error(e);
-            bot.post("There was a error while unsubscribing! Try again later...");
+            bot.post(`There was a error while unsubscribing from the feed!
+    ${e}`);
             return;
         }
                

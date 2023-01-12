@@ -57,13 +57,13 @@ bot.onPost(async (user, content) => {
         try { 
             let feed = await extract(content.split(" ")[2]);
             let subscriptions = db.get("feeds");
-            for (i in subscriptions) {
+            for (let i in subscriptions) {
                 if (subscriptions[i].name == feed.title) {
                     subscriptions.splice(i, 1);
                 }
             }
             db.set(subscriptions);
-            bot.post(`Successfully unsubscribed from ${feed.title}!`);
+            bot.post(`Successfully unsubscribed from "${feed.title}"!`);
         } catch(e) {
             console.error(e);
             bot.post(`There was a error while unsubscribing from the feed!

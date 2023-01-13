@@ -28,7 +28,6 @@ async function update() {
 ${extractedFeed.entries[0].title}:
     ${extractedFeed.entries[0].link}`, feeds[i].id);
                 feeds[i].latest = extractedFeed.entries[0];
-                feeds[i].name = extractedFeed.title;
                 db.set("feeds", feeds);
             } else {
                 console.log(`No new entries found for ${feeds[i].name}`);

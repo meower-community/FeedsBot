@@ -18,13 +18,18 @@ async function update() {
     try {
         let feeds = db.get("feeds");
         for (let i in feeds) {
+            console.log(`Updating feed for "${feeds[i].name}"...`);
             let extractedFeed = await extract(feeds[i].url);
             
             if (feeds[i].latest.id != extractedFeed.entries[0].id) {
+                console.log(`New entry found for "${feeds[i].name}"`);
                 bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!
     ${extractedFeed.entries[0].link}`);
                 feeds[i].latest = extractedFeed.entries[0];
+                feeds[i].name = extractedFeed.title;
+                db.set("feeds", feeds);
             } else {
+                console.log(`No new entries found for "${feeds[i].name}"`);
                 continue;
             }
         }

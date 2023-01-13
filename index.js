@@ -24,8 +24,8 @@ async function update() {
             
             if (feeds[i].latest.id != extractedFeed.entries[0].id) {
                 console.log(`New entry found for "${feeds[i].name}"`);
-                bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!
-    ${extractedFeed.entries[0].link}`);
+                bot.post(`${extractedFeed.latest.title}
+    ${extractedFeed.entries[0].link}`, feeds[i].id);
                 feeds[i].latest = extractedFeed.entries[0];
                 feeds[i].name = extractedFeed.title;
                 db.set("feeds", feeds);
@@ -39,25 +39,31 @@ async function update() {
     }
 }
 
-bot.onPost(async (user, content) => {
+bot.onPost(async (user, content, origin) => {
     if (content.startsWith(`@${username} help`)) {
-        bot.post(`Commands: ${help.join(", ")}`);
+        bot.post(`Commands: ${help.join(", ")}`, origin);
     }
 
     if (content.startsWith(`@${username} subscribe`)) {
         try {
             console.log("Subscribing to feed...");
-            let feed = await extract(content.split(" ")[2]);
-            let subscriptions = db.get("feeds");
-            subscriptions.push({"name": feed.title, "url": content.split(" ")[2], "latest": feed.entries[0],"user": user});
-            console.log(`Subscribed to ${feed.title}`);
-            bot.post(`Successfully subscribed to "${feed.title}"!`)
-        db.set(subscriptions);
-        } catch(e) {
+            var feed = await extract(content.split(" ")[2]);
+            var subscriptions = db.get("feeds");
 
+            bot.send(JSON.stringify({"cmd": "direct", "val": {"cmd": "create_chat", "val": feed.title}}));
+            bot.send(JSON.stringify({"cmd": "direct", "val": {"cmd": "get_chat_list", "val": {"page": 1}}}));
+            setTimeout(() => {}, 10000);
+            bot.send(JSON.stringify({"cmd": "direct", "val": {"cmd": "add_to_chat", "val": {"chatid": db.get("temp").id, "username": user}}}));
+            
+            subscriptions.push({"name": feed.title, "url": content.split(" ")[2], "latest": feed.entries[0], "id": db.get("temp").id});
+            console.log(`Subscribed to ${feed.title}`);
+            bot.post(`Successfully subscribed to "${feed.title}"!`, origin)
+            db.set("feeds", subscriptions);
+            //db.delete("temp");
+        } catch(e) {
             console.error(e);
             bot.post(`There was a error subscribing to the feed!
-    ${e}`);
+    ${e}`, origin);
             return;
         }
     }
@@ -73,11 +79,11 @@ bot.onPost(async (user, content) => {
                 }
             }
             db.set(subscriptions);
-            bot.post(`Successfully unsubscribed from "${feed.title}"!`);
+            bot.post(`Successfully unsubscribed from "${feed.title}"!`, origin);
         } catch(e) {
             console.error(e);
             bot.post(`There was a error while unsubscribing from the feed!
-    ${e}`);
+    ${e}`, origin);
             return;
         }
                
@@ -87,6 +93,21 @@ bot.onPost(async (user, content) => {
 
 bot.onMessage((data) => {
     console.log(`New message: ${data}`);
+
+    try {
+        let chats = data.val.payload.all_chats;
+        
+        for (let i in chats) {
+            if (feed.title == chats[i].nickname) {
+                db.set("temp", {"id": chats[i]._id});
+                break;
+            } else {
+                continue;
+            }
+        }
+    } catch(e) {
+        return;
+    }
 });
 
 bot.onClose(() => {
@@ -98,9 +119,9 @@ bot.onClose(() => {
 });
 
 bot.onLogin(() => {
-    bot.post(`${username} is now online! Use @${username} help to see a list of commands.`);
+    //bot.post(`${username} is now online! Use @${username} help to see a list of commands.`);
 });
 
 setInterval(() => {
     update();
-}, 30000);
+}, 60000);

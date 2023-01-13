@@ -7,7 +7,7 @@ import { exec } from "child_process";
 dotenv.config();
 
 const username = process.env["FB_USERNAME"], password = process.env["FB_PASSWORD"];
-const help = [`@${username} help`, `@${username} subscribe`, `@${username} unsubscribe`];
+const help = [`@${username} help`, `@${username} subscribe`, `@${username} unsubscribe`, `@${username} subscribed`];
 const db = new JSONdb("db.json");
 const bot = new Bot(username, password);
 
@@ -26,7 +26,7 @@ async function update() {
                 console.log(`New entry found for ${feeds[i].name}`);
                 bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!        
 ${extractedFeed.entries[0].title}:
-    ${extractedFeed.entries[0].link}`);
+    ${extractedFeed.entries[0].link}`, feeds[i].id);
                 feeds[i].latest = extractedFeed.entries[0];
                 feeds[i].name = extractedFeed.title;
                 db.set("feeds", feeds);
@@ -50,12 +50,19 @@ bot.onPost(async (user, content, origin) => {
             console.log("Subscribing to feed...");
             let feed = await extract(content.split(" ")[2]);
             let subscriptions = db.get("feeds");
-            subscriptions.push({"name": feed.title, "url": content.split(" ")[2], "latest": feed.entries[0],"user": user});
+
+            for (let i in subscriptions) {
+                if (subscriptions[i].user == user && subscriptions[i].name == feed.title) {
+                    bot.post(`You already subscribed to ${feed.title}!`, origin);
+                    return;
+                }
+            }
+
+            subscriptions.push({"name": feed.title, "url": content.split(" ")[2], "latest": feed.entries[0],"user": user, "id": (origin ? origin : null)});
             console.log(`Subscribed to ${feed.title}`);
             bot.post(`Successfully subscribed to ${feed.title}!`, origin);
             db.set(subscriptions);
         } catch(e) {
-
             console.error(e);
             bot.post(`There was a error subscribing to the feed!
     ${e}`, origin);
@@ -81,8 +88,6 @@ bot.onPost(async (user, content, origin) => {
     ${e}`, origin);
             return;
         }
-               
-
     }
 });
 

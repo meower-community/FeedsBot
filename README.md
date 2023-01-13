@@ -20,3 +20,10 @@ Unsubscribes from a feed
 ```
 @FeedsBot unsubscribe [feed url]
 ```
+## Running
+```bash
+FB_USERNAME="[username here]"
+FB_PASSWORD="[password here]"
+npm install
+npm run start
+```

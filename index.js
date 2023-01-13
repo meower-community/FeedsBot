@@ -19,18 +19,18 @@ async function update() {
     try {
         let feeds = db.get("feeds");
         for (let i in feeds) {
-            console.log(`Updating feed for "${feeds[i].name}"...`);
+            console.log(`Updating feed for ${feeds[i].name}...`);
             let extractedFeed = await extract(feeds[i].url);
             
             if (feeds[i].latest.id != extractedFeed.entries[0].id) {
-                console.log(`New entry found for "${feeds[i].name}"`);
+                console.log(`New entry found for ${feeds[i].name}`);
                 bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!
     ${extractedFeed.entries[0].link}`);
                 feeds[i].latest = extractedFeed.entries[0];
                 feeds[i].name = extractedFeed.title;
                 db.set("feeds", feeds);
             } else {
-                console.log(`No new entries found for "${feeds[i].name}"`);
+                console.log(`No new entries found for ${feeds[i].name}`);
                 continue;
             }
         }
@@ -51,8 +51,8 @@ bot.onPost(async (user, content) => {
             let subscriptions = db.get("feeds");
             subscriptions.push({"name": feed.title, "url": content.split(" ")[2], "latest": feed.entries[0],"user": user});
             console.log(`Subscribed to ${feed.title}`);
-            bot.post(`Successfully subscribed to "${feed.title}"!`)
-        db.set(subscriptions);
+            bot.post(`Successfully subscribed to ${feed.title}!`)
+            db.set(subscriptions);
         } catch(e) {
 
             console.error(e);
@@ -73,7 +73,7 @@ bot.onPost(async (user, content) => {
                 }
             }
             db.set(subscriptions);
-            bot.post(`Successfully unsubscribed from "${feed.title}"!`);
+            bot.post(`Successfully unsubscribed from ${feed.title}!`);
         } catch(e) {
             console.error(e);
             bot.post(`There was a error while unsubscribing from the feed!
@@ -103,4 +103,4 @@ bot.onLogin(() => {
 
 setInterval(() => {
     update();
-}, 30000);
+}, 60000);

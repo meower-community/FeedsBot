@@ -26,10 +26,16 @@ async function update() {
             if (feeds[i].latest.id != extractedFeed.entries[0].id) {
                 let link = await fetch(`https://api.shrtco.de/v2/shorten?url=${extractedFeed.entries[0].link}`).then(res => res.json()).result.full_short_link;
                 console.log(`New entry found for ${feeds[i].name}`);
-
-                bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!        
+                
+                if (feeds[i].id != "home") {
+                    bot.post(`A new entry in "${feeds[i].name}" has been published!        
 ${extractedFeed.entries[0].title}:
     ${link}`, feeds[i].id);
+                } else {
+                    bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!        
+${extractedFeed.entries[0].title}:
+    ${link}`, feeds[i].id);
+                }
                 feeds[i].latest = extractedFeed.entries[0];
                 db.set("feeds", feeds);
             } else {
@@ -55,6 +61,7 @@ bot.onPost(async (user, content, origin) => {
 
             for (let i in subscriptions) {
                 if (subscriptions[i].user == user && subscriptions[i].name == feed.title) {
+                    console.log("Feed already exists under this user");
                     bot.post(`You already subscribed to ${feed.title}!`, origin);
                     return;
                 }

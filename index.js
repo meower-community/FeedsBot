@@ -40,9 +40,9 @@ ${extractedFeed.entries[0].title}:
     }
 }
 
-bot.onPost(async (user, content) => {
+bot.onPost(async (user, content, origin) => {
     if (content.startsWith(`@${username} help`)) {
-        bot.post(`Commands: ${help.join(", ")}`);
+        bot.post(`Commands: ${help.join(", ")}`, origin);
     }
 
     if (content.startsWith(`@${username} subscribe`)) {
@@ -52,13 +52,13 @@ bot.onPost(async (user, content) => {
             let subscriptions = db.get("feeds");
             subscriptions.push({"name": feed.title, "url": content.split(" ")[2], "latest": feed.entries[0],"user": user});
             console.log(`Subscribed to ${feed.title}`);
-            bot.post(`Successfully subscribed to ${feed.title}!`)
+            bot.post(`Successfully subscribed to ${feed.title}!`, origin);
             db.set(subscriptions);
         } catch(e) {
 
             console.error(e);
             bot.post(`There was a error subscribing to the feed!
-    ${e}`);
+    ${e}`, origin);
             return;
         }
     }
@@ -74,11 +74,11 @@ bot.onPost(async (user, content) => {
                 }
             }
             db.set(subscriptions);
-            bot.post(`Successfully unsubscribed from ${feed.title}!`);
+            bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);
         } catch(e) {
             console.error(e);
             bot.post(`There was a error while unsubscribing from the feed!
-    ${e}`);
+    ${e}`, origin);
             return;
         }
                

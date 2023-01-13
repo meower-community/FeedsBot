@@ -1,7 +1,7 @@
 # FeedsBot
 FeedsBot lets you subscribe to RSS and Atom feeds on Meower!
 ## Functions
-- Subscribe to feeds (RSS, Atom, JSON Feed)
+- Subscribe to feeds ([RSS Feed](https://www.rssboard.org/rss-specification), [Atom Feed](https://datatracker.ietf.org/doc/html/rfc5023), [JSON Feed](https://www.jsonfeed.org/version/1.1/))
 - Recieve notifications when a new entry is published
 - Unsubscribe from feeds
 ## Commands

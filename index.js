@@ -3,6 +3,7 @@ import * as dotenv from "dotenv";
 import JSONdb from "simple-json-db";
 import { extract } from "@extractus/feed-extractor";
 import { exec } from "child_process";
+import fetch from "node-fetch";
 
 dotenv.config();
 
@@ -23,10 +24,12 @@ async function update() {
             let extractedFeed = await extract(feeds[i].url);
             
             if (feeds[i].latest.id != extractedFeed.entries[0].id) {
+                let link = await fetch(`https://api.shrtco.de/v2/shorten?url=${extractedFeed.entries[0].link}`).then(res => res.json()).result.full_short_link;
                 console.log(`New entry found for ${feeds[i].name}`);
+
                 bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!        
 ${extractedFeed.entries[0].title}:
-    ${extractedFeed.entries[0].link}`, feeds[i].id);
+    ${link}`, feeds[i].id);
                 feeds[i].latest = extractedFeed.entries[0];
                 db.set("feeds", feeds);
             } else {

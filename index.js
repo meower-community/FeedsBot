@@ -25,6 +25,8 @@ async function update() {
             if (feeds[i].latest.id != extractedFeed.entries[0].id) {
                 console.log(`New entry found for ${feeds[i].name}`);
                 bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!
+                
+${extractedFeed.entries[0].title}:
     ${extractedFeed.entries[0].link}`);
                 feeds[i].latest = extractedFeed.entries[0];
                 feeds[i].name = extractedFeed.title;

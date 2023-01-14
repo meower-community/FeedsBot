@@ -8,7 +8,7 @@ import fetch from "node-fetch";
 dotenv.config();
 
 const username = process.env["FB_USERNAME"], password = process.env["FB_PASSWORD"];
-const help = [`@${username} help`, `@${username} subscribe`, `@${username} unsubscribe`, `@${username} subscribed`];
+const help = [`@${username} help`, `@${username} subscribe`, `@${username} unsubscribe`];
 const db = new JSONdb("db.json");
 const bot = new Bot(username, password);
 
@@ -17,6 +17,7 @@ if (!(db.has("feeds"))) {
 }
 
 async function update() {
+    console.log("Updating feeds...");
     try {
         let feeds = db.get("feeds");
         for (let i in feeds) {
@@ -28,7 +29,7 @@ async function update() {
                 console.log(`New entry found for ${feeds[i].name}`);
                 
                 if (feeds[i].id != "home") {
-                    bot.post(`A new entry in "${feeds[i].name}" has been published!        
+                    bot.post(`A new entry in ${feeds[i].name} has been published!        
 ${extractedFeed.entries[0].title}:
     ${link.result.full_short_link}`, feeds[i].id);
                 } else {
@@ -42,6 +43,7 @@ ${extractedFeed.entries[0].title}:
                 console.log(`No new entries found for ${feeds[i].name}`);
                 continue;
             }
+            console.log("Finished updating feeds");
         }
     } catch(e) {
         console.error(e);

@@ -24,13 +24,13 @@ async function update() {
             let extractedFeed = await extract(feeds[i].url);
             
             if (feeds[i].latest.id != extractedFeed.entries[0].id) {
-                let link = await fetch(`https://api.shrtco.de/v2/shorten?url=${extractedFeed.entries[0].link}`).then(res => res.json()).result.full_short_link;
+                let link = await fetch(`https://api.shrtco.de/v2/shorten?url=${extractedFeed.entries[0].link}`).then(res => res.json());
                 console.log(`New entry found for ${feeds[i].name}`);
                 
                 if (feeds[i].id != "home") {
                     bot.post(`A new entry in "${feeds[i].name}" has been published!        
 ${extractedFeed.entries[0].title}:
-    ${link}`, feeds[i].id);
+    ${link.result.full_short_link}`, feeds[i].id);
                 } else {
                     bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!        
 ${extractedFeed.entries[0].title}:

@@ -76,7 +76,8 @@ bot.onPost(async (user, content, origin) => {
             db.set(subscriptions);
         } catch(e) {
             console.error(e);
-            bot.post(`There was a error subscribing to the feed! ${e}`, origin);
+            bot.post(`There was a error subscribing to the feed!
+    ${e}`, origin);
             return;
         }
     }
@@ -106,7 +107,7 @@ bot.onPost(async (user, content, origin) => {
         let feeds = [];
         for (let i in subscriptions) {
             if (user == subscriptions[i].user) {
-                feeds.push(`${subscriptions[i].name}: ${relative(new Date(subscriptions[i].latest.published).getTime())}`);
+                feeds.push(`${subscriptions[i].name}: Last entry posted ${relative(new Date(subscriptions[i].latest.published).getTime())}`);
                 continue;
             }
         }

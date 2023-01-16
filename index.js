@@ -9,7 +9,7 @@ import { toRelative } from "./lib/relative.js";
 dotenv.config();
 
 const username = process.env["FB_USERNAME"], password = process.env["FB_PASSWORD"];
-const help = [`@${username} help`, `@${username} subscribe`, `@${username} unsubscribe`, `@${username} feeds`];
+const help = [`@${username} help`, `@${username} subscribe`, `@${username} unsubscribe`, `@${username} feeds`, `@${username} read`];
 const db = new JSONdb("db.json");
 
 const bot = new Bot(username, password);
@@ -118,6 +118,27 @@ bot.onPost(async (user, content, origin) => {
         } else {
             bot.post(`The feeds you have subscribed to:
     ${feeds.join("\n    ")}`, origin);
+        }
+    }
+
+    if (content.startsWith(`@${username} read`)) {
+        try {
+            let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));
+
+            if (content.split(" ")[3] == undefined) {
+                bot.post(`${feed.entries[0].title}:
+    ${feed.entries[0].description}`, origin);
+            } else {
+                if ((parseInt(content.split(" ")[3]) + 1) > feed.entries.length) {
+                    bot.post("Number is over the entry count!", origin);
+                } else {
+                    bot.post(`${feed.entries[parseInt(content.split(" ")[3]) + 1].title}:
+    ${feed.entries[parseInt(content.split(" ")[3]) + 1].description}`, origin);
+                }
+            }
+        } catch(e) {
+            bot.post(`There was an error fetching the feed!
+    ${e}`, origin);
         }
     }
 });

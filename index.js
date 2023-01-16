@@ -4,6 +4,7 @@ import JSONdb from "simple-json-db";
 import { extract } from "@extractus/feed-extractor";
 import { exec } from "child_process";
 import fetch from "node-fetch";
+import { relative } from "./lib/relative.js";
 
 dotenv.config();
 
@@ -106,7 +107,7 @@ bot.onPost(async (user, content, origin) => {
         let feeds = [];
         for (let i in subscriptions) {
             if (user == subscriptions[i].user) {
-                feeds.push(subscriptions[i].name);
+                feeds.push(`${subscriptions[i].name}: ${relative(new Date(subscriptions[i].latest.published).getTime())}`);
                 continue;
             }
         }

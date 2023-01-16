@@ -1,4 +1,3 @@
-<img src="https://files.mdwalters.ml/feedsbot.svg" width="200" height="200"></span>
 # FeedsBot
 FeedsBot lets you subscribe to RSS and Atom feeds on Meower!
 ## Functions

@@ -111,8 +111,13 @@ bot.onPost(async (user, content, origin) => {
                 continue;
             }
         }
-        bot.post(`The feeds you have subscribed to:
+
+        if (feeds.length == 0) {
+            bot.post(`You haven't subscribed to any feeds!`, origin);
+        } else {
+            bot.post(`The feeds you have subscribed to:
     ${feeds.join("\n    ")}`, origin);
+        }
     }
 });
 

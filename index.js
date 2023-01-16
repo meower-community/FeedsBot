@@ -8,7 +8,7 @@ import fetch from "node-fetch";
 dotenv.config();
 
 const username = process.env["FB_USERNAME"], password = process.env["FB_PASSWORD"];
-const help = [`@${username} help`, `@${username} subscribe`, `@${username} unsubscribe`];
+const help = [`@${username} help`, `@${username} subscribe`, `@${username} unsubscribe`, `@${username} feeds`];
 const db = new JSONdb("db.json");
 const bot = new Bot(username, password);
 
@@ -86,7 +86,7 @@ bot.onPost(async (user, content, origin) => {
             let feed = await extract(content.split(" ")[2]).replace('https://', 'http://');
             let subscriptions = db.get("feeds");
             for (let i in subscriptions) {
-                if (subscriptions[i].name == feed.title && user == subscriptions[i].user) {
+                if (subscriptions[i].name == feed.title) {
                     subscriptions.splice(i, 1);
                     break;
                 }
@@ -99,6 +99,19 @@ bot.onPost(async (user, content, origin) => {
     ${e}`, origin);
             return;
         }
+    }
+
+    if (content.startsWith(`@${username} feeds`)) {
+        let subscriptions = db.get("feeds");
+        let feeds = [];
+        for (let i in subscriptions) {
+            if (user == subscriptions[i].user) {
+                feeds.push(subscriptions[i].name);
+                continue;
+            }
+        }
+        bot.post(`The feeds you have subscribed to:
+    ${feeds.join("\n    ")}`, origin);
     }
 });
 

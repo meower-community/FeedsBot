@@ -11,6 +11,7 @@ dotenv.config();
 const username = process.env["FB_USERNAME"], password = process.env["FB_PASSWORD"];
 const help = [`@${username} help`, `@${username} subscribe`, `@${username} unsubscribe`, `@${username} feeds`];
 const db = new JSONdb("db.json");
+
 const bot = new Bot(username, password);
 
 if (!(db.has("feeds"))) {
@@ -44,8 +45,8 @@ ${extractedFeed.entries[0].title}:
                 console.log(`No new entries found for ${feeds[i].name}`);
                 continue;
             }
-            console.log("Finished updating feeds");
         }
+        console.log("Finished updating feeds");
     } catch(e) {
         console.error(e);
     }
@@ -59,7 +60,7 @@ bot.onPost(async (user, content, origin) => {
     if (content.startsWith(`@${username} subscribe`)) {
         try {
             console.log("Subscribing to feed...");
-            let feed = await extract(content.split(" ")[2].replace("https://", "http://"));
+            let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));
             let subscriptions = db.get("feeds");
 
             for (let i in subscriptions) {
@@ -83,8 +84,8 @@ bot.onPost(async (user, content, origin) => {
     }
 
     if (content.startsWith(`@${username} unsubscribe`)) {
-        try { 
-            let feed = await extract(content.split(" ")[2].replace("https://", "http://"));
+        try {
+            let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));
             let subscriptions = db.get("feeds");
             for (let i in subscriptions) {
                 if (subscriptions[i].name == feed.title) {

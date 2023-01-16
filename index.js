@@ -59,7 +59,7 @@ bot.onPost(async (user, content, origin) => {
     if (content.startsWith(`@${username} subscribe`)) {
         try {
             console.log("Subscribing to feed...");
-            let feed = await extract(content.split(" ")[2]);
+            let feed = await extract(content.split(" ")[2]).replace('https://', 'http://');
             let subscriptions = db.get("feeds");
 
             for (let i in subscriptions) {
@@ -76,15 +76,14 @@ bot.onPost(async (user, content, origin) => {
             db.set(subscriptions);
         } catch(e) {
             console.error(e);
-            bot.post(`There was a error subscribing to the feed!
-    ${e}`, origin);
+            bot.post(`There was a error subscribing to the feed! ${e}`, origin);
             return;
         }
     }
 
     if (content.startsWith(`@${username} unsubscribe`)) {
         try { 
-            let feed = await extract(content.split(" ")[2]);
+            let feed = await extract(content.split(" ")[2]).replace('https://', 'http://');
             let subscriptions = db.get("feeds");
             for (let i in subscriptions) {
                 if (subscriptions[i].name == feed.title) {

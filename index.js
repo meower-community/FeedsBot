@@ -75,8 +75,7 @@ bot.onPost(async (user, content, origin) => {
             db.set(subscriptions);
         } catch(e) {
             console.error(e);
-            bot.post(`There was a error subscribing to the feed!
-    ${e}`, origin);
+            bot.post(`There was a error subscribing to the feed! ${e}`, origin);
             return;
         }
     }

@@ -4,7 +4,7 @@ import JSONdb from "simple-json-db";
 import { extract } from "@extractus/feed-extractor";
 import { exec } from "child_process";
 import fetch from "node-fetch";
-import { toRelative } from "./lib/relative.js";
+import { toRelative } from "./../lib/relative.js";
 
 dotenv.config();
 

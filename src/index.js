@@ -30,15 +30,9 @@ async function update() {
                 let link = await fetch(`https://api.shrtco.de/v2/shorten?url=${extractedFeed.entries[0].link}`).then(res => res.json());
                 console.log(`New entry found for ${feeds[i].name}`);
                 
-                if (feeds[i].id != "home") {
-                    bot.post(`A new entry in ${feeds[i].name} has been published!        
+                bot.post(`A new entry in ${feeds[i].name} has been published!        
 ${extractedFeed.entries[0].title}:
     ${link.result.full_short_link}`, feeds[i].id);
-                } else {
-                    bot.post(`@${feeds[i].user} A new entry in "${feeds[i].name}" has been published!        
-${extractedFeed.entries[0].title}:
-    ${link}`, feeds[i].id);
-                }
                 feeds[i].latest = extractedFeed.entries[0];
                 db.set("feeds", feeds);
             } else {
@@ -58,6 +52,11 @@ bot.onPost(async (user, content, origin) => {
     }
 
     if (content.startsWith(`@${username} subscribe`)) {
+        if (!(origin)) {
+            bot.post("You can't subscribe to feeds in Home!", origin);
+            return;
+        }
+
         try {
             console.log("Subscribing to feed...");
             let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));

@@ -70,7 +70,7 @@ bot.onPost(async (user, content, origin) => {
                 }
             }
 
-            subscriptions.push({"name": feed.title, "url": content.split(" ")[2], "latest": feed.entries[0],"user": user, "id": (origin ? origin : null)});
+            subscriptions.push({"name": feed.title, "url": content.split(" ")[2], "latest": feed.entries[0], "user": user, "id": (origin ? origin : null)});
             console.log(`Subscribed to ${feed.title}`);
             bot.post(`Successfully subscribed to ${feed.title}!`, origin);
             db.set(subscriptions);
@@ -86,14 +86,19 @@ bot.onPost(async (user, content, origin) => {
         try {
             let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));
             let subscriptions = db.get("feeds");
-            for (let i in subscriptions) {
+            let i;
+            for (i in subscriptions) {
                 if (subscriptions[i].name == feed.title) {
-                    subscriptions.splice(i, 1);
+                    delete subscriptions[i];
+                    db.set(subscriptions);
+                    bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);
                     break;
                 }
             }
-            db.set(subscriptions);
-            bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);
+
+            if (i == subscriptions.length) {
+                bot.post(`You haven't subscribed to ${feed.title}!`, origin);
+            }
         } catch(e) {
             console.error(e);
             bot.post(`There was a error while unsubscribing from the feed!

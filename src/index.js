@@ -166,5 +166,5 @@ bot.onLogin(() => {
 
 setInterval(() => {
     update();
-}, 60000);
+}, 300000);
 

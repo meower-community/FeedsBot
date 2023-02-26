@@ -20,6 +20,11 @@ Unsubscribes from a feed
 ```
 @FeedsBot unsubscribe [feed url]
 ```
+### feeds
+Shows you all of the feeds you have subscribed to
+```
+@FeedsBot subscribed
+```
 ## Running
 ```bash
 FB_USERNAME="[username here]"

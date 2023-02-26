@@ -91,9 +91,15 @@ bot.onPost(async (user, content, origin) => {
     }
 
     if (content.startsWith(`@${username} unsubscribe`)) {
+        if (!(origin)) {
+            bot.post("You can't unsubscribe to feeds in Home!", origin);
+            return;
+        }
+
         try {
             let subscriptions = db.get("feeds");
             let i;
+
             for (i in subscriptions) {
                 if (subscriptions[i].url == content.split(" ")[2].replace(/https:\/\//i, "http://") && subscriptions[i].user == user) {
                     delete subscriptions[i];

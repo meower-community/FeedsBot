@@ -5,6 +5,7 @@ import { extract } from "@extractus/feed-extractor";
 import { exec } from "child_process";
 import fetch from "node-fetch";
 import { toRelative } from "./../lib/relative.js";
+import { shorten } from "./../lib/shorten.js";
 
 dotenv.config();
 
@@ -27,12 +28,12 @@ async function update() {
             let extractedFeed = await extract(feeds[i].url);
             
             if (feeds[i].latest.id != extractedFeed.entries[0].id) {
-                let link = await fetch(`https://api.shrtco.de/v2/shorten?url=${extractedFeed.entries[0].link}`).then(res => res.json());
+                let link = await shorten(extractedFeed.entries[0].link);
                 console.log(`New entry found for ${feeds[i].name}`);
                 
                 bot.post(`A new entry in ${feeds[i].name} has been published!        
 ${extractedFeed.entries[0].title}:
-    ${link.result.full_short_link}`, feeds[i].id);
+    ${link}`, feeds[i].id);
                 feeds[i].latest = extractedFeed.entries[0];
                 db.set("feeds", feeds);
             } else {
@@ -166,3 +167,4 @@ bot.onLogin(() => {
 setInterval(() => {
     update();
 }, 60000);
+

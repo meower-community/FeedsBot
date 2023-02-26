@@ -9,8 +9,15 @@ import { shorten } from "./../lib/shorten.js";
 
 dotenv.config();
 
-const username = process.env["FB_USERNAME"], password = process.env["FB_PASSWORD"];
-const help = [`@${username} help`, `@${username} subscribe`, `@${username} unsubscribe`, `@${username} feeds`, `@${username} read`];
+const username = process.env["FB_USERNAME"]
+const password = process.env["FB_PASSWORD"];
+const help = [
+    `@${username} help`,
+    `@${username} subscribe`,
+    `@${username} unsubscribe`,
+    `@${username} feeds`,
+    `@${username} read`
+];
 const db = new JSONdb("db.json");
 
 const bot = new Bot(username, password);
@@ -97,11 +104,11 @@ bot.onPost(async (user, content, origin) => {
         }
 
         try {
+            let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));
             let subscriptions = db.get("feeds");
             let i;
-
             for (i in subscriptions) {
-                if (subscriptions[i].url == content.split(" ")[2].replace(/https:\/\//i, "http://") && subscriptions[i].user == user) {
+                if (subscriptions[i].url == feed.link) {
                     delete subscriptions[i];
                     db.set(subscriptions);
                     bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);

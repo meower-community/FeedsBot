@@ -49,7 +49,8 @@ ${extractedFeed.entries[0].title}:
 
 bot.onPost(async (user, content, origin) => {
     if (content.startsWith(`@${username} help`)) {
-        bot.post(`Commands: ${help.join(", ")}`, origin);
+        bot.post(`Commands:
+    ${help.join("\n    ")}`, origin);
     }
 
     if (content.startsWith(`@${username} subscribe`)) {
@@ -64,14 +65,20 @@ bot.onPost(async (user, content, origin) => {
             let subscriptions = db.get("feeds");
 
             for (let i in subscriptions) {
-                if (subscriptions[i].user == user && subscriptions[i].name == feed.title) {
+                if (subscriptions[i].user == user && subscriptions[i].name == feed.title && subscriptions[i].id == origin) {
                     console.log("Feed already exists under this user");
                     bot.post(`You already subscribed to ${feed.title}!`, origin);
                     return;
                 }
             }
 
-            subscriptions.push({"name": feed.title, "url": content.split(" ")[2], "latest": feed.entries[0], "user": user, "id": (origin ? origin : null)});
+            subscriptions.push({
+                "name": feed.title,
+                "url": content.split(" ")[2],
+                "latest": feed.entries[0],
+                "user": user, 
+                "id": origin
+            });
             console.log(`Subscribed to ${feed.title}`);
             bot.post(`Successfully subscribed to ${feed.title}!`, origin);
             db.set(subscriptions);
@@ -85,11 +92,10 @@ bot.onPost(async (user, content, origin) => {
 
     if (content.startsWith(`@${username} unsubscribe`)) {
         try {
-            let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));
             let subscriptions = db.get("feeds");
             let i;
             for (i in subscriptions) {
-                if (subscriptions[i].name == feed.title) {
+                if (subscriptions[i].url == content.split(" ")[2].replace(/https:\/\//i, "http://") && subscriptions[i].user == user) {
                     delete subscriptions[i];
                     db.set(subscriptions);
                     bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);
@@ -135,7 +141,7 @@ bot.onPost(async (user, content, origin) => {
     ${feed.entries[0].description}`, origin);
             } else {
                 if ((parseInt(content.split(" ")[3]) + 1) > feed.entries.length) {
-                    bot.post("Number is over the entry count!", origin);
+                    bot.post("This entry doesn't exist!", origin);
                 } else {
                     bot.post(`${feed.entries[parseInt(content.split(" ")[3]) + 1].title}:
     ${feed.entries[parseInt(content.split(" ")[3]) + 1].description}`, origin);

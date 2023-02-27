@@ -28,8 +28,8 @@ if (!(db.has("feeds"))) {
 
 async function update() {
     console.log("Updating feeds...");
+    let feeds = db.get("feeds");
     try {
-        let feeds = db.get("feeds");
         for (let i in feeds) {
             console.log(`Updating feed for ${feeds[i].name}...`);
             let extractedFeed = await extract(feeds[i].url);

@@ -108,7 +108,7 @@ bot.onPost(async (user, content, origin) => {
             let subscriptions = db.get("feeds");
             let i;
             for (i in subscriptions) {
-                if (subscriptions[i].url == feed.link) {
+                if (subscriptions[i].title == feed.title) {
                     delete subscriptions[i];
                     db.set(subscriptions);
                     bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);

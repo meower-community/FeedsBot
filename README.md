@@ -23,7 +23,7 @@ Unsubscribes from a feed
 ### feeds
 Shows you all of the feeds you have subscribed to
 ```
-@FeedsBot subscribed
+@FeedsBot feeds
 ```
 ## Running
 ```bash

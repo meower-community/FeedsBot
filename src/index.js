@@ -54,49 +54,50 @@ ${extractedFeed.entries[0].title}:
     }
 }
 
-bot.onPost(async (user, content, origin) => {
-    if (content.startsWith(`@${username} help`)) {
-        bot.post(`Commands:
+bot.onCommand("help", (user, argv, origin) => {
+    bot.post(`Commands:
     ${help.join("\n    ")}`, origin);
+});
+
+bot.onCommand("subscribe", async (user, argv, origin) => {
+    if (!(origin)) {
+        bot.post("You can't subscribe to feeds in Home!", origin);
+        return;
     }
 
-    if (content.startsWith(`@${username} subscribe`)) {
-        if (!(origin)) {
-            bot.post("You can't subscribe to feeds in Home!", origin);
-            return;
-        }
+    try {
+        console.log("Subscribing to feed...");
+        let feed = await extract(argv[0].replace(/https:\/\//i, "http://"));
+        let subscriptions = db.get("feeds");
 
-        try {
-            console.log("Subscribing to feed...");
-            let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));
-            let subscriptions = db.get("feeds");
-
-            for (let i in subscriptions) {
-                if (subscriptions[i].user == user && subscriptions[i].name == feed.title && subscriptions[i].id == origin) {
-                    console.log("Feed already exists under this user");
-                    bot.post(`You already subscribed to ${feed.title}!`, origin);
-                    return;
-                }
+        for (let i in subscriptions) {
+            if (subscriptions[i].user == user && subscriptions[i].name == feed.title && subscriptions[i].id == origin) {
+                console.log("Feed already exists under this user");
+                bot.post(`You already subscribed to ${feed.title}!`, origin);
+                return;
             }
-
-            subscriptions.push({
-                "name": feed.title,
-                "url": content.split(" ")[2],
-                "latest": feed.entries[0],
-                "user": user, 
-                "id": origin
-            });
-            console.log(`Subscribed to ${feed.title}`);
-            bot.post(`Successfully subscribed to ${feed.title}!`, origin);
-            db.set(subscriptions);
-        } catch(e) {
-            console.error(e);
-            bot.post(`There was a error subscribing to the feed!
-    ${e}`, origin);
-            return;
         }
-    }
 
+        subscriptions.push({
+            "name": feed.title,
+            "url": argv[0],
+            "latest": feed.entries[0],
+            "user": user, 
+            "id": origin
+        });
+
+        console.log(`Subscribed to ${feed.title}`);
+        bot.post(`Successfully subscribed to ${feed.title}!`, origin);
+        db.set(subscriptions);
+    } catch(e) {
+        console.error(e);
+        bot.post(`There was a error subscribing to the feed!
+${e}`, origin);
+        return;
+    }
+});
+
+bot.onPost(async (user, content, origin) => {
     if (content.startsWith(`@${username} unsubscribe`)) {
         if (!(origin)) {
             bot.post("You can't unsubscribe to feeds in Home!", origin);
@@ -108,8 +109,8 @@ bot.onPost(async (user, content, origin) => {
             let subscriptions = db.get("feeds");
             let i;
             for (i in subscriptions) {
-                if (subscriptions[i].title == feed.title) {
-                    delete subscriptions[i];
+                if (subscriptions[i].name == feed.title) {
+                    subscriptions.splice(i, 1);
                     db.set(subscriptions);
                     bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);
                     break;

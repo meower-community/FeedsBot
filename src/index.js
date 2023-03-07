@@ -9,7 +9,7 @@ import { shorten } from "./../lib/shorten.js";
 
 dotenv.config();
 
-const username = process.env["FB_USERNAME"]
+const username = process.env["FB_USERNAME"];
 const password = process.env["FB_PASSWORD"];
 const help = [
     `@${username} help`,
@@ -139,7 +139,7 @@ bot.onPost(async (user, content, origin) => {
         }
 
         if (feeds.length == 0) {
-            bot.post(`You haven't subscribed to any feeds!`, origin);
+            bot.post("You haven't subscribed to any feeds!", origin);
         } else {
             bot.post(`The feeds you have subscribed to:
     ${feeds.join("\n    ")}`, origin);

@@ -41,6 +41,8 @@ async function update() {
                 bot.post(`A new entry in ${feeds[i].name} has been published!        
 ${extractedFeed.entries[0].title}:
     ${link}`, feeds[i].id);
+                extractedFeed.entries[0].discovered = new Date().getTime();
+                extractedFeed.entries[0].published = new Date(extractedFeed.entries[0].published).getTime();
                 feeds[i].latest = extractedFeed.entries[0];
                 db.set("feeds", feeds);
             } else {
@@ -92,60 +94,60 @@ bot.onCommand("subscribe", async (user, argv, origin) => {
     } catch(e) {
         console.error(e);
         bot.post(`There was a error subscribing to the feed!
-${e}`, origin);
+    ${e}`, origin);
         return;
     }
 });
 
-bot.onPost(async (user, content, origin) => {
-    if (content.startsWith(`@${username} unsubscribe`)) {
-        if (!(origin)) {
-            bot.post("You can't unsubscribe to feeds in Home!", origin);
-            return;
-        }
-
-        try {
-            let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));
-            let subscriptions = db.get("feeds");
-            let i;
-            for (i in subscriptions) {
-                if (subscriptions[i].name == feed.title) {
-                    subscriptions.splice(i, 1);
-                    db.set(subscriptions);
-                    bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);
-                    break;
-                }
-            }
-
-            if (i == subscriptions.length) {
-                bot.post(`You haven't subscribed to ${feed.title}!`, origin);
-            }
-        } catch(e) {
-            console.error(e);
-            bot.post(`There was a error while unsubscribing from the feed!
-    ${e}`, origin);
-            return;
-        }
+bot.onCommand("unsubscribe", (user, argv, origin) => {
+    if (!(origin)) {
+        bot.post("You can't unsubscribe to feeds in Home!", origin);
+        return;
     }
 
-    if (content.startsWith(`@${username} feeds`)) {
+    try {
+        let feed = await extract(argv[0].replace(/https:\/\//i, "http://"));
         let subscriptions = db.get("feeds");
-        let feeds = [];
-        for (let i in subscriptions) {
-            if (user == subscriptions[i].user) {
-                feeds.push(`${subscriptions[i].name}: Last entry posted ${toRelative(new Date(subscriptions[i].latest.published).getTime())}`);
-                continue;
+        let i;
+        for (i in subscriptions) {
+            if (subscriptions[i].name == feed.title) {
+                subscriptions.splice(i, 1);
+                db.set(subscriptions);
+                bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);
+                break;
             }
         }
 
-        if (feeds.length == 0) {
+        if (i == subscriptions.length) {
+            bot.post(`You haven't subscribed to ${feed.title}!`, origin);
+        }
+    } catch(e) {
+        console.error(e);
+        bot.post(`There was a error while unsubscribing from the feed!
+    ${e}`, origin);
+        return;
+    }
+});
+
+bot.onCommand("feeds", (user, argv, origin) => {
+    let subscriptions = db.get("feeds");
+    let feeds = [];
+    for (let i in subscriptions) {
+        if (user == subscriptions[i].user) {
+            feeds.push(`${subscriptions[i].name}: Last entry posted ${toRelative(new Date(subscriptions[i].latest.published).getTime())}`);
+            continue;
+        }
+
+        if (feeds.length === 0) {
             bot.post("You haven't subscribed to any feeds!", origin);
         } else {
             bot.post(`The feeds you have subscribed to:
     ${feeds.join("\n    ")}`, origin);
         }
     }
+});
 
+bot.onPost(async (user, content, origin) => {
     if (content.startsWith(`@${username} read`)) {
         try {
             let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));

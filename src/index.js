@@ -19,7 +19,6 @@ const help = [
     `@${username} read`
 ];
 const db = new JSONdb("db.json");
-
 const bot = new Bot(username, password);
 
 if (!(db.has("feeds"))) {

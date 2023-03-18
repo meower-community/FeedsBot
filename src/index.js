@@ -107,19 +107,16 @@ bot.onCommand("unsubscribe", (user, argv, origin) => {
     try {
         let feed = await extract(argv[0].replace(/https:\/\//i, "http://"));
         let subscriptions = db.get("feeds");
-        let i;
-        for (i in subscriptions) {
+        for (let i in subscriptions) {
             if (subscriptions[i].name == feed.title) {
                 subscriptions.splice(i, 1);
                 db.set(subscriptions);
                 bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);
-                break;
+                return;
             }
         }
 
-        if (i == subscriptions.length) {
-            bot.post(`You haven't subscribed to ${feed.title}!`, origin);
-        }
+        bot.post(`You haven't subscribed to ${feed.title}!`, origin);
     } catch(e) {
         console.error(e);
         bot.post(`There was a error while unsubscribing from the feed!

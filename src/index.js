@@ -146,26 +146,24 @@ bot.onCommand("feeds", (user, argv, origin) => {
     }
 });
 
-bot.onPost(async (user, content, origin) => {
-    if (content.startsWith(`@${username} read`)) {
-        try {
-            let feed = await extract(content.split(" ")[2].replace(/https:\/\//i, "http://"));
+bot.onCommand("read", (user, argv, origin) => {
+    try {
+        let feed = await extract(argv[2].replace(/https:\/\//i, "http://"));
 
-            if (content.split(" ")[3] == undefined) {
-                bot.post(`${feed.entries[0].title}:
-    ${feed.entries[0].description}`, origin);
+        if (argv[2] == undefined) {
+            bot.post(`${feed.entries[0].title}:
+${feed.entries[0].description}`, origin);
+        } else {
+            if ((parseInt(argv[2]) + 1) > feed.entries.length) {
+                bot.post("This entry doesn't exist!", origin);
             } else {
-                if ((parseInt(content.split(" ")[3]) + 1) > feed.entries.length) {
-                    bot.post("This entry doesn't exist!", origin);
-                } else {
-                    bot.post(`${feed.entries[parseInt(content.split(" ")[3]) + 1].title}:
-    ${feed.entries[parseInt(content.split(" ")[3]) + 1].description}`, origin);
-                }
+                bot.post(`${feed.entries[parseInt(argv[2]) + 1].title}:
+${feed.entries[parseInt(argv[2]) + 1].description}`, origin);
             }
-        } catch(e) {
-            bot.post(`There was an error fetching the feed!
-    ${e}`, origin);
         }
+    } catch(e) {
+        bot.post(`There was an error fetching the feed!
+${e}`, origin);
     }
 });
 

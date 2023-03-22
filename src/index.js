@@ -97,7 +97,7 @@ bot.onCommand("subscribe", async (ctx) => {
     }
 });
 
-bot.onCommand("unsubscribe", (ctx) => {
+bot.onCommand("unsubscribe", async (ctx) => {
     if (!ctx.origin) {
         ctx.reply("You can't unsubscribe to feeds in Home!");
         return;
@@ -140,7 +140,7 @@ bot.onCommand("feeds", (ctx) => {
     }
 });
 
-bot.onCommand("read", (ctx) => {
+bot.onCommand("read", async (ctx) => {
     try {
         let feed = await extract(argv[2].replace(/https:\/\//i, "http://"));
 

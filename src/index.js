@@ -19,7 +19,7 @@ const help = [
     `@${username} read`
 ];
 const db = new JSONdb("db.json");
-const bot = new Bot(username, password);
+const bot = new Bot();
 
 if (!(db.has("feeds"))) {
     db.set("feeds", []);
@@ -55,14 +55,14 @@ ${extractedFeed.entries[0].title}:
     }
 }
 
-bot.onCommand("help", (user, argv, origin) => {
-    bot.post(`Commands:
-    ${help.join("\n    ")}`, origin);
+bot.onCommand("help", (ctx) => {
+    ctx.reply(`Commands:
+    ${help.join("\n    ")}`);
 });
 
-bot.onCommand("subscribe", async (user, argv, origin) => {
-    if (!(origin)) {
-        bot.post("You can't subscribe to feeds in Home!", origin);
+bot.onCommand("subscribe", async (ctx) => {
+    if (!ctx.origin) {
+        ctx.post("You can't subscribe to feeds in Home!");
         return;
     }
 
@@ -72,35 +72,34 @@ bot.onCommand("subscribe", async (user, argv, origin) => {
         let subscriptions = db.get("feeds");
 
         for (let i in subscriptions) {
-            if (subscriptions[i].user == user && subscriptions[i].name == feed.title && subscriptions[i].id == origin) {
+            if (subscriptions[i].user == ctx.user && subscriptions[i].name == feed.title && subscriptions[i].id == ctx.origin) {
                 console.log("Feed already exists under this user");
-                bot.post(`You already subscribed to ${feed.title}!`, origin);
+                ctx.reply(`You already subscribed to ${feed.title}!`);
                 return;
             }
         }
 
         subscriptions.push({
             "name": feed.title,
-            "url": argv[0],
+            "url": ctx.args[0],
             "latest": feed.entries[0],
-            "user": user, 
-            "id": origin
+            "user": ctx.user, 
+            "id": ctx.origin
         });
 
         console.log(`Subscribed to ${feed.title}`);
-        bot.post(`Successfully subscribed to ${feed.title}!`, origin);
+        ctx.reply(`Successfully subscribed to ${feed.title}!`);
         db.set(subscriptions);
     } catch(e) {
         console.error(e);
-        bot.post(`There was a error subscribing to the feed!
-    ${e}`, origin);
+        ctx.reply(`There was a error subscribing to the feed!\n${e}`);
         return;
     }
 });
 
-bot.onCommand("unsubscribe", (user, argv, origin) => {
-    if (!(origin)) {
-        bot.post("You can't unsubscribe to feeds in Home!", origin);
+bot.onCommand("unsubscribe", (ctx) => {
+    if (!ctx.origin) {
+        ctx.reply("You can't unsubscribe to feeds in Home!");
         return;
     }
 
@@ -111,21 +110,20 @@ bot.onCommand("unsubscribe", (user, argv, origin) => {
             if (subscriptions[i].name == feed.title) {
                 subscriptions.splice(i, 1);
                 db.set(subscriptions);
-                bot.post(`Successfully unsubscribed from ${feed.title}!`, origin);
+                ctx.reply(`Successfully unsubscribed from ${feed.title}!`);
                 return;
             }
         }
 
-        bot.post(`You haven't subscribed to ${feed.title}!`, origin);
+        ctx.reply(`You haven't subscribed to ${feed.title}!`);
     } catch(e) {
         console.error(e);
-        bot.post(`There was a error while unsubscribing from the feed!
-    ${e}`, origin);
+        ctx.reply(`There was a error while unsubscribing from the feed!\n${e}`);
         return;
     }
 });
 
-bot.onCommand("feeds", (user, argv, origin) => {
+bot.onCommand("feeds", (ctx) => {
     let subscriptions = db.get("feeds");
     let feeds = [];
     for (let i in subscriptions) {
@@ -135,32 +133,28 @@ bot.onCommand("feeds", (user, argv, origin) => {
         }
 
         if (feeds.length === 0) {
-            bot.post("You haven't subscribed to any feeds!", origin);
+            ctx.reply("You haven't subscribed to any feeds!");
         } else {
-            bot.post(`The feeds you have subscribed to:
-    ${feeds.join("\n    ")}`, origin);
+            ctx.reply(`The feeds you have subscribed to:\n${feeds.join("\n")}`);
         }
     }
 });
 
-bot.onCommand("read", (user, argv, origin) => {
+bot.onCommand("read", (ctx) => {
     try {
         let feed = await extract(argv[2].replace(/https:\/\//i, "http://"));
 
         if (argv[2] == undefined) {
-            bot.post(`${feed.entries[0].title}:
-${feed.entries[0].description}`, origin);
+            ctx.reply(`${feed.entries[0].title}:\n${feed.entries[0].description}`);
         } else {
-            if ((parseInt(argv[2]) + 1) > feed.entries.length) {
-                bot.post("This entry doesn't exist!", origin);
+            if ((parseInt(ctx.args[2]) + 1) > feed.entries.length) {
+                ctx.reply("This entry doesn't exist!");
             } else {
-                bot.post(`${feed.entries[parseInt(argv[2]) + 1].title}:
-${feed.entries[parseInt(argv[2]) + 1].description}`, origin);
+                ctx.reply(`${feed.entries[parseInt(ctx.args[2]) + 1].title}:\n${feed.entries[parseInt(ctx.args[2]) + 1].description}`);
             }
         }
     } catch(e) {
-        bot.post(`There was an error fetching the feed!
-${e}`, origin);
+        ctx.reply(`There was an error fetching the feed!\n${e}`);
     }
 });
 
@@ -170,10 +164,7 @@ bot.onMessage((data) => {
 
 bot.onClose(() => {
     console.error("Disconnected");
-    let command = exec("npm run start");
-    command.stdout.on("data", (output) => {
-        console.log(output.toString());
-    });
+    bot.login(username, password);
 });
 
 bot.onLogin(() => {
@@ -184,3 +175,4 @@ setInterval(() => {
     update();
 }, 300000);
 
+bot.login(username, password);

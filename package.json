@@ -20,7 +20,7 @@
   "homepage": "https://github.com/MeowerBots/FeedsBot#readme",
   "dependencies": {
     "@extractus/feed-extractor": "^6.2.2",
-    "dotenv": "^16.1.3",
+    "dotenv": "^16.1.4",
     "meowerbot": "^2023.5.12",
     "node-fetch": "^3.3.1",
     "simple-json-db": "^2.0.0"

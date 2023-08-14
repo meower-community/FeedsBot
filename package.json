@@ -26,6 +26,6 @@
     "simple-json-db": "^2.0.0"
   },
   "devDependencies": {
-    "eslint": "^8.42.0"
+    "eslint": "^8.47.0"
   }
 }
